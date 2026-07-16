@@ -12,6 +12,7 @@ const path = require('path');
 const { pathToFileURL } = require('url');
 const store = require('./store');
 const desktopPin = require('./desktopPin');
+const displayLayout = require('./displayLayout');
 
 const HEADER_H = 46;
 const MIN_W = 180;
@@ -21,6 +22,7 @@ const sectionWindows = new Map(); // id -> BrowserWindow (live, wired windows)
 let settingsWindow = null;
 let settingsOpening = false;
 const movedTimers = new Map();
+let settlingUntil = 0; // Date.now() ms until which OS-forced moves are ignored
 
 const PRELOAD = path.join(__dirname, '..', 'preload', 'preload.js');
 const ROOT_HTML = path.join(__dirname, '..', 'renderer', 'root', 'root.html');
@@ -216,6 +218,14 @@ function scheduleMovedPersist(id, win) {
   clearTimeout(movedTimers.get(id));
   movedTimers.set(id, setTimeout(() => {
     if (win.isDestroyed()) return;
+    // Never let an OS-forced move (monitor unplug), a programmatic reflow/restore,
+    // or a drag while displaced overwrite the canonical layout.
+    const persist = displayLayout.shouldPersistMove({
+      displaced: !!win.__displaced,
+      suppress: !!win.__suppressPersist,
+      settling: Date.now() < settlingUntil,
+    });
+    if (!persist) return;
     const s = store.getSection(id);
     if (!s) return;
     const wb = win.getBounds();
@@ -224,6 +234,55 @@ function scheduleMovedPersist(id, win) {
     store.patchSection(id, { bounds: { ...s.bounds, ...patch } });
     pushState(id);
   }, 140));
+}
+
+// Called synchronously the moment a display change is detected: suppress move
+// persistence for a window of time AND flush any queued move-persists, so an
+// OS-forced relocation that already fired can't be written before we react.
+function beginSettling(ms = 2000) {
+  settlingUntil = Date.now() + ms;
+  for (const t of movedTimers.values()) clearTimeout(t);
+  movedTimers.clear();
+}
+
+// Move a card to a transient (auto-tidy) position. Marks it displaced and
+// suppresses persistence so section.bounds (the canonical layout) is untouched.
+function applyTransientBounds(id, bounds) {
+  const win = sectionWindows.get(id);
+  if (!win || win.isDestroyed()) return;
+  win.__displaced = true;
+  win.__suppressPersist = true;
+  win.setBounds({
+    x: Math.round(bounds.x), y: Math.round(bounds.y),
+    width: Math.round(bounds.width), height: Math.round(bounds.height),
+  });
+  applyPin(win); // keep embedded/WorkerW cards on the desktop layer
+  setImmediate(() => { if (!win.isDestroyed()) win.__suppressPersist = false; });
+}
+
+// Move a card back to its stored (canonical) bounds and clear the displaced flag.
+function restoreCanonical(id) {
+  const win = sectionWindows.get(id);
+  const s = store.getSection(id);
+  if (!win || win.isDestroyed() || !s) return;
+  win.__suppressPersist = true;
+  win.setBounds({
+    x: Math.round(s.bounds.x), y: Math.round(s.bounds.y),
+    width: Math.round(s.bounds.width),
+    height: s.collapsed ? HEADER_H : Math.round(s.bounds.height),
+  });
+  applyPin(win);
+  win.__displaced = false;
+  setImmediate(() => { if (!win.isDestroyed()) win.__suppressPersist = false; });
+}
+
+// Ids of windows currently shown at a transient position.
+function displacedIds() {
+  const out = new Set();
+  for (const [id, win] of sectionWindows) {
+    if (!win.isDestroyed() && win.__displaced) out.add(id);
+  }
+  return out;
 }
 
 // State the renderer needs, with live x/y merged in.
@@ -372,6 +431,7 @@ module.exports = {
   createSectionWindow, closeSectionWindow, getWindow, getBounds, focusSection,
   pushState, send, broadcast, liveState,
   setBoundsFromRenderer, setCollapsed,
+  beginSettling, applyTransientBounds, restoreCanonical, displacedIds,
   setVisibleAll, reapplyPinAll,
   hasWindows, allIds,
   openSettingsWindow,
