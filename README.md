@@ -29,6 +29,9 @@ real files are never moved or deleted.
 - **Tray-managed** — add sections, lock the layout, hide/show all, start with
   Windows, and a global hotkey to lock/unlock (default `Ctrl+Alt+L`).
 - **Persistent** — layout and shortcuts are saved and restored between launches.
+- **Monitor-aware** — undock a laptop and cards from a disconnected monitor
+  auto-tidy onto the remaining screen; redock and every card snaps back to its
+  exact saved position. Your layout is never lost on a monitor change.
 
 ## Run it (development)
 
