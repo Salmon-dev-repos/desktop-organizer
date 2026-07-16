@@ -1,5 +1,25 @@
+# Dependencies / build output
 node_modules/
 dist/
+
+# Logs & OS cruft
 *.log
 .DS_Store
 Thumbs.db
+
+# ── Personal / machine-local data — never push to a public repo ──
+# App user data (electron-store). Normally lives in %APPDATA%/desktop-organizer
+# on your machine, but ignore it here too in case it's ever written into the
+# project directory (portable mode, exports, backups).
+config.json
+/config.json
+*.config.json
+data/
+backups/
+*.backup
+
+# Claude Code local settings (machine-specific: permissions, paths, tool state)
+.claude/settings.local.json
+.claude/proven-config.json
+.claude/.proven-config-version
+.claude-flow/
