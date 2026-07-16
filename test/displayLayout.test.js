@@ -84,3 +84,25 @@ test('shouldPersistMove: only a genuine at-home drag persists', () => {
   assert.equal(layout.shouldPersistMove({ displaced: false, suppress: true,  settling: false }), false);
   assert.equal(layout.shouldPersistMove({ displaced: false, suppress: false, settling: true  }), false);
 });
+
+test('planReflow: overflow cascades so every header stays on-screen and positions are distinct', () => {
+  const area = { x: 0, y: 0, width: 900, height: 700 };
+  const orphans = Array.from({ length: 20 }, (_, i) => ({ id: `o${i}`, width: 300, height: 250 }));
+  const out = layout.planReflow(orphans, area);
+  assert.equal(out.length, 20);
+  // every position is distinct (no two cards land on the same spot)
+  const seen = new Set();
+  for (const o of out) {
+    const key = `${o.bounds.x},${o.bounds.y}`;
+    assert.ok(!seen.has(key), `duplicate position ${key} for ${o.id}`);
+    seen.add(key);
+  }
+  // every title bar (HEADER_H tall, full width) is fully within the work area
+  for (const o of out) {
+    const b = o.bounds;
+    assert.ok(b.x >= area.x, `${o.id} off left`);
+    assert.ok(b.x + b.width <= area.x + area.width, `${o.id} off right`);
+    assert.ok(b.y >= area.y, `${o.id} off top`);
+    assert.ok(b.y + layout.HEADER_H <= area.y + area.height, `${o.id} header off bottom`);
+  }
+});

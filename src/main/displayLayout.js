@@ -29,26 +29,53 @@ function isVisible(canonical, displays) {
 }
 
 // Tidy orphaned cards into a left-to-right, top-to-bottom grid inside workArea.
-// Each card keeps its own width/height. Wraps to a new row at the right edge and
-// clamps the header on-screen if it would overflow the bottom.
+// While cards fit, they form a clean non-overlapping grid. Once the grid can no
+// longer fit a full card above the bottom edge, the remaining cards CASCADE
+// (stacked-window style): each is offset by HEADER_H vertically so every title
+// bar stays visible and grabbable, and no two share a position.
 function planReflow(orphans, workArea) {
   const out = [];
   const left = workArea.x + MARGIN;
+  const top = workArea.y + MARGIN;
   const rightLimit = workArea.x + workArea.width - MARGIN;
   const bottomLimit = workArea.y + workArea.height - MARGIN;
+
   let x = left;
-  let y = workArea.y + MARGIN;
+  let y = top;
   let rowH = 0;
-  for (const o of orphans) {
-    if (x + o.width > rightLimit && x > left) {
-      x = left;
-      y += rowH + GAP;
-      rowH = 0;
-    }
-    const cy = Math.min(y, Math.max(workArea.y, bottomLimit - HEADER_H));
-    out.push({ id: o.id, bounds: { x, y: cy, width: o.width, height: o.height } });
+  let i = 0;
+
+  // Phase 1 — clean grid for as many cards as fully fit.
+  for (; i < orphans.length; i++) {
+    const o = orphans[i];
+    if (x + o.width > rightLimit && x > left) { x = left; y += rowH + GAP; rowH = 0; }
+    const atOrigin = (x === left && y === top);
+    if (y + o.height > bottomLimit && !atOrigin) break; // no room for a full card -> cascade
+    out.push({ id: o.id, bounds: { x, y, width: o.width, height: o.height } });
     x += o.width + GAP;
     rowH = Math.max(rowH, o.height);
+  }
+
+  // Phase 2 — cascade the overflow so every header stays visible and positions
+  // stay distinct. Rows step by HEADER_H (title bars peek out); columns step
+  // sideways. Offset from the grid origin so the first cascade card is not
+  // hidden under the first grid card.
+  if (i < orphans.length) {
+    const stepY = HEADER_H;
+    const stepX = Math.max(1, Math.round(HEADER_H * 0.6));
+    const originX = left + stepX;
+    const originY = top + stepY;
+    const rows = Math.max(1, Math.floor((bottomLimit - HEADER_H - originY) / stepY) + 1);
+    for (let k = 0; i < orphans.length; i++, k++) {
+      const o = orphans[i];
+      const col = Math.floor(k / rows);
+      const row = k % rows;
+      const maxX = Math.max(left, rightLimit - o.width);
+      let cx = originX + col * stepX;
+      if (cx > maxX) cx = left + ((col * stepX) % Math.max(1, maxX - left + 1)); // wrap very wide stacks
+      const cy = originY + row * stepY;
+      out.push({ id: o.id, bounds: { x: cx, y: cy, width: o.width, height: o.height } });
+    }
   }
   return out;
 }
