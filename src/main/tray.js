@@ -6,6 +6,7 @@ const store = require('./store');
 const wm = require('./windowManager');
 const actions = require('./actions');
 const autostart = require('./autostart');
+const displayManager = require('./displayManager');
 
 let tray = null;
 let visible = true;
@@ -70,6 +71,16 @@ function rebuild() {
       checked: autostart.getLaunchAtLogin(),
       click: () => actions.setLaunchAtLogin(!autostart.getLaunchAtLogin()),
     },
+    ...(!app.isPackaged ? [
+      { type: 'separator' },
+      {
+        label: 'Developer',
+        submenu: [
+          { label: 'Simulate undock (laptop only)', click: () => displayManager.simulate('undock') },
+          { label: 'Simulate redock', click: () => displayManager.simulate('redock') },
+        ],
+      },
+    ] : []),
     { type: 'separator' },
     { label: 'Quit Desktop Organizer', click: () => { app.isQuiting = true; app.quit(); } },
   ];
