@@ -6,6 +6,7 @@ const store = require('./store');
 const desktopPin = require('./desktopPin');
 const wm = require('./windowManager');
 const portal = require('./folderPortal');
+const displayManager = require('./displayManager');
 const actions = require('./actions');
 const ipc = require('./ipc');
 const tray = require('./tray');
@@ -80,6 +81,7 @@ function start() {
 
   for (const s of store.listSections()) wm.createSectionWindow(s);
   portal.startAll();
+  displayManager.start();
 
   // Re-apply the "hide desktop icons" preference from last session.
   actions.applyDesktopIconsSetting();
