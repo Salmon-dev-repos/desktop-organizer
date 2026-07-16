@@ -341,7 +341,16 @@ function setBoundsFromRenderer(id, bounds) {
   // Persist to disk only after the drag settles, so we don't write on every frame.
   clearTimeout(boundsPersistTimers.get(id));
   boundsPersistTimers.set(id, setTimeout(() => {
-    if (!win.isDestroyed()) store.patchSection(id, { bounds: { x, y, width, height } });
+    if (win.isDestroyed()) return;
+    // Same guard as scheduleMovedPersist: never persist a resize made while the
+    // card is displaced (tidied after undock), being programmatically moved, or
+    // inside a dock settling window — that would overwrite the canonical bounds.
+    if (!displayLayout.shouldPersistMove({
+      displaced: !!win.__displaced,
+      suppress: !!win.__suppressPersist,
+      settling: Date.now() < settlingUntil,
+    })) return;
+    store.patchSection(id, { bounds: { x, y, width, height } });
   }, 220));
 }
 
