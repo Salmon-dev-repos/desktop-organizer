@@ -106,3 +106,21 @@ test('planReflow: overflow cascades so every header stays on-screen and position
     assert.ok(b.y + layout.HEADER_H <= area.y + area.height, `${o.id} header off bottom`);
   }
 });
+
+test('planReflow: heavy overflow fills distinct cascade slots across multiple columns', () => {
+  const area = { x: 0, y: 0, width: 700, height: 400 };
+  const orphans = Array.from({ length: 40 }, (_, i) => ({ id: `o${i}`, width: 200, height: 150 }));
+  const out = layout.planReflow(orphans, area);
+  assert.equal(out.length, 40);
+  const seen = new Set();
+  for (const o of out) {
+    const key = `${o.bounds.x},${o.bounds.y}`;
+    assert.ok(!seen.has(key), `duplicate position ${key} for ${o.id}`);
+    seen.add(key);
+  }
+  for (const o of out) {
+    const b = o.bounds;
+    assert.ok(b.x >= area.x && b.x + b.width <= area.x + area.width, `${o.id} off horizontally`);
+    assert.ok(b.y >= area.y && b.y + layout.HEADER_H <= area.y + area.height, `${o.id} header off vertically`);
+  }
+});

@@ -56,24 +56,30 @@ function planReflow(orphans, workArea) {
     rowH = Math.max(rowH, o.height);
   }
 
-  // Phase 2 — cascade the overflow so every header stays visible and positions
-  // stay distinct. Rows step by HEADER_H (title bars peek out); columns step
-  // sideways. Offset from the grid origin so the first cascade card is not
-  // hidden under the first grid card.
+  // Phase 2 — cascade the overflow into a bounded slot grid: rows step by
+  // HEADER_H (title bars peek out), columns step sideways. Every (col,row) slot
+  // is a distinct on-screen position, so cascade positions are unique up to
+  // rows*cols cards (hundreds on a real screen). Beyond that capacity slots are
+  // reused — an inherent limit of a finite area, far past any real section count.
   if (i < orphans.length) {
     const stepY = HEADER_H;
     const stepX = Math.max(1, Math.round(HEADER_H * 0.6));
-    const originX = left + stepX;
-    const originY = top + stepY;
+    const originX = left + stepX; // offset so the first cascade card isn't hidden
+    const originY = top + stepY;  // under the first grid card
+    let maxW = 0;
+    for (let j = i; j < orphans.length; j++) maxW = Math.max(maxW, orphans[j].width);
     const rows = Math.max(1, Math.floor((bottomLimit - HEADER_H - originY) / stepY) + 1);
+    const cols = Math.max(1, Math.floor((rightLimit - maxW - originX) / stepX) + 1);
+    const slots = rows * cols;
     for (let k = 0; i < orphans.length; i++, k++) {
       const o = orphans[i];
-      const col = Math.floor(k / rows);
-      const row = k % rows;
-      const maxX = Math.max(left, rightLimit - o.width);
-      let cx = originX + col * stepX;
-      if (cx > maxX) cx = left + ((col * stepX) % Math.max(1, maxX - left + 1)); // wrap very wide stacks
-      const cy = originY + row * stepY;
+      const slot = k % slots;
+      const row = slot % rows;
+      const col = Math.floor(slot / rows);
+      // The clamps are a no-op inside the computed slot grid; they only guard a
+      // work area too small to hold even one on-screen slot.
+      const cx = Math.min(originX + col * stepX, Math.max(left, rightLimit - o.width));
+      const cy = Math.min(originY + row * stepY, Math.max(top, bottomLimit - HEADER_H));
       out.push({ id: o.id, bounds: { x: cx, y: cy, width: o.width, height: o.height } });
     }
   }
