@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; img-src data:; style-src 'unsafe-inline' file:; script-src 'self' file:; font-src 'self' file:;" />
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="settings.css" />
+</head>
+<body class="theme-dark">
+  <header class="titlebar">
+    <div class="brand"><span class="dot"></span> Desktop Organizer</div>
+    <span class="drag"></span>
+    <button id="close" class="close" title="Close" tabindex="-1">✕</button>
+  </header>
+
+  <main class="scroll">
+    <section class="panel">
+      <h2>Sections</h2>
+      <div class="row">
+        <button class="btn primary" id="add-todo">✅ Add to-do list</button>
+        <button class="btn" id="add-bucket">＋ Add bucket</button>
+        <button class="btn" id="add-portal">🗂 Add folder portal…</button>
+      </div>
+      <div id="sections-list" class="sections-list"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Reminders</h2>
+      <label class="check"><input type="checkbox" id="remindersEnabled" /><span>Enable desktop notifications <em>(to-do reminders)</em></span></label>
+      <label class="field"><span>Default reminder</span>
+        <select id="reminderLeadMinutes">
+          <option value="0">At due time</option>
+          <option value="5">5 min before</option>
+          <option value="10">10 min before</option>
+          <option value="30">30 min before</option>
+          <option value="60">1 hour before</option>
+          <option value="1440">1 day before</option>
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" id="reminderSound" /><span>Play a sound with reminders</span></label>
+    </section>
+
+    <section class="panel">
+      <h2>Appearance</h2>
+      <label class="field"><span>Theme</span>
+        <select id="theme"><option value="dark">Dark</option><option value="light">Light</option><option value="auto">Auto (system)</option></select>
+      </label>
+      <label class="field"><span>Accent color</span><input type="color" id="accent" /></label>
+      <label class="field"><span>Card opacity <b id="opacity-val"></b></span><input type="range" id="opacity" min="0.4" max="1" step="0.02" /></label>
+      <label class="field"><span>Corner radius <b id="radius-val"></b></span><input type="range" id="radius" min="4" max="26" step="1" /></label>
+      <label class="field"><span>Icon size <b id="icon-val"></b></span><input type="range" id="iconSize" min="32" max="64" step="2" /></label>
+      <label class="check"><input type="checkbox" id="showLabels" /><span>Show item labels</span></label>
+    </section>
+
+    <section class="panel">
+      <h2>Behavior</h2>
+      <label class="check"><input type="checkbox" id="hideDesktopIcons" /><span>Hide Windows desktop icons <em>(no duplicates behind cards)</em></span></label>
+      <label class="check"><input type="checkbox" id="locked" /><span>Lock layout (no move / resize)</span></label>
+      <label class="check"><input type="checkbox" id="snapToGrid" /><span>Snap to grid</span></label>
+      <label class="field indent"><span>Grid size <b id="grid-val"></b></span><input type="range" id="gridSize" min="4" max="48" step="2" /></label>
+      <label class="check"><input type="checkbox" id="embedInDesktop" /><span>Embed in desktop layer <em>(experimental — survives Win+D)</em></span></label>
+      <label class="check"><input type="checkbox" id="launchAtLogin" /><span>Start with Windows</span></label>
+      <label class="field"><span>Toggle-lock hotkey</span><input type="text" id="hotkey" spellcheck="false" placeholder="Control+Alt+L" /></label>
+    </section>
+
+    <section class="panel">
+      <h2>Configuration</h2>
+      <div class="row">
+        <button class="btn" id="export">Export…</button>
+        <button class="btn" id="import">Import…</button>
+        <button class="btn danger" id="reset">Reset all</button>
+      </div>
+      <p class="note">Config lives in <code>%APPDATA%\\desktop-organizer\\config.json</code>. Everything is shortcut-based — your real files are never moved.</p>
+    </section>
+  </main>
+
+  <script src="settings.js"></script>
+</body>
+</html>

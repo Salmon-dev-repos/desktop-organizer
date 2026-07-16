@@ -1,0 +1,67 @@
+body { background: rgb(var(--bg-1)); overflow: hidden; display: flex; flex-direction: column; }
+
+.titlebar {
+  height: 44px; flex: 0 0 44px;
+  display: flex; align-items: center; gap: 10px; padding: 0 8px 0 14px;
+  -webkit-app-region: drag;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent);
+}
+.brand { font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 9px; }
+.brand .dot { width: 11px; height: 11px; border-radius: 4px; background: linear-gradient(160deg, var(--accent), #7ee7c4); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent); }
+.titlebar .drag { flex: 1 1 auto; align-self: stretch; }
+.close { -webkit-app-region: no-drag; width: 30px; height: 30px; border-radius: 8px; color: var(--muted); font-size: 13px; }
+.close:hover { background: #e5484622; color: #ff8f8f; }
+
+.scroll { flex: 1 1 auto; overflow: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+.panel {
+  background: linear-gradient(180deg, rgba(var(--bg-2), 0.6), rgba(var(--bg-2), 0.35));
+  border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px;
+}
+.panel h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 12px; font-weight: 600; }
+
+.field { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 7px 0; font-size: 13px; }
+.field > span { color: var(--text); display: flex; gap: 8px; align-items: baseline; }
+.field b { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+.field.indent { padding-left: 26px; }
+
+select, input[type="text"] {
+  background: rgb(var(--bg-1)); color: var(--text);
+  border: 1px solid var(--border-strong); border-radius: 9px; padding: 7px 10px; font: inherit; min-width: 150px; outline: none;
+}
+select:focus, input[type="text"]:focus { border-color: var(--accent); }
+input[type="color"] { width: 44px; height: 30px; padding: 0; border: 1px solid var(--border-strong); border-radius: 8px; background: none; cursor: pointer; }
+input[type="range"] { width: 180px; accent-color: var(--accent); }
+
+.check { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 13px; cursor: pointer; }
+.check input { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; }
+.check em { color: var(--muted); font-style: normal; font-size: 12px; }
+
+.row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.btn {
+  background: rgba(255, 255, 255, 0.06); color: var(--text);
+  border: 1px solid var(--border-strong); border-radius: 10px; padding: 9px 14px; font-size: 13px; font-weight: 500;
+  transition: background 0.15s ease, transform 0.06s ease;
+}
+.btn:hover { background: rgba(255, 255, 255, 0.11); }
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--accent); color: #06101f; border-color: transparent; font-weight: 600; }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.danger { color: #ff9b9b; border-color: #e5484633; }
+.btn.danger:hover { background: #e5484618; }
+
+.sections-list { display: flex; flex-direction: column; gap: 7px; margin-top: 6px; }
+.srow {
+  display: flex; align-items: center; gap: 10px; padding: 9px 11px;
+  background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); border-radius: 10px; font-size: 13px;
+}
+.srow .stype { font-size: 15px; }
+.srow .stitle { flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.srow .stag { font-size: 11px; color: var(--muted); background: var(--tile-hover); padding: 2px 8px; border-radius: 999px; }
+.srow .sdel { color: var(--muted); width: 26px; height: 26px; border-radius: 7px; }
+.srow .sdel:hover { background: #e5484622; color: #ff8f8f; }
+.sections-list .none { color: var(--muted); font-size: 12px; padding: 6px 2px; }
+
+.note { color: var(--muted); font-size: 11.5px; line-height: 1.5; margin-top: 6px; }
+.note code { background: var(--tile-hover); padding: 1px 5px; border-radius: 5px; font-family: "Cascadia Code", Consolas, monospace; font-size: 11px; }

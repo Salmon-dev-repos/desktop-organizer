@@ -1,0 +1,50 @@
+/* Shared design tokens + reset for all windows (acrylic-glass, dark by default). */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+  overflow: hidden;
+}
+
+:root {
+  --accent: #6ea8fe;
+  --card-opacity: 0.82;
+  --radius: 14px;
+  --icon-size: 44px;
+
+  --bg-1: 20, 23, 31;
+  --bg-2: 30, 34, 46;
+  --text: #eef1f6;
+  --muted: #a7b0c0;
+  --border: rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
+  --tile-hover: rgba(255, 255, 255, 0.08);
+  --tile-active: color-mix(in srgb, var(--accent) 24%, transparent);
+  --scroll: rgba(255, 255, 255, 0.16);
+}
+
+body.theme-light {
+  --bg-1: 244, 247, 251;
+  --bg-2: 255, 255, 255;
+  --text: #1b2330;
+  --muted: #5b6472;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.16);
+  --shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+  --tile-hover: rgba(0, 0, 0, 0.05);
+  --tile-active: color-mix(in srgb, var(--accent) 20%, transparent);
+  --scroll: rgba(0, 0, 0, 0.18);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+button {
+  font: inherit; color: inherit; border: none; background: none; cursor: pointer;
+}

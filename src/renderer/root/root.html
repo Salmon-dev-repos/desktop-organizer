@@ -1,0 +1,11 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>desktop-organizer root</title>
+<!--
+  Invisible, never-shown host page. Its sole job is to be the single renderer
+  process that every section card + the settings window live in: the main
+  process calls window.open() in this page's context (see windowManager.js),
+  so each opened window shares THIS process instead of spawning its own. That
+  collapses N Chromium renderers (~78 MB each) down to one. No script or style
+  is needed here — window.open is driven entirely from the main process.
+-->

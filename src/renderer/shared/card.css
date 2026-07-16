@@ -1,0 +1,116 @@
+/* Shared card chrome for every draggable widget window (folder sections + to-do
+   lists): the acrylic-glass panel, the 46px header (title / badge / icon buttons),
+   the collapse behaviour, and the 8 resize grips. Page-specific CSS (section.css,
+   todo.css) styles only the body content. */
+
+.card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(180deg, rgba(var(--bg-2), var(--card-opacity)), rgba(var(--bg-1), var(--card-opacity)));
+  backdrop-filter: blur(20px) saturate(1.35);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  overflow: hidden;
+}
+
+/* ---------- header ---------- */
+.header {
+  height: 46px;
+  flex: 0 0 46px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px 0 6px;
+  -webkit-app-region: drag;
+  border-bottom: 1px solid var(--border);
+}
+.drag-space { flex: 1 1 auto; align-self: stretch; -webkit-app-region: drag; }
+
+.chev, .icon-btn, .title, .title-input, .badge { -webkit-app-region: no-drag; }
+
+.chev {
+  display: grid; place-items: center;
+  width: 26px; height: 26px; border-radius: 8px;
+  color: var(--muted);
+  transition: transform 0.18s ease, background 0.15s ease, color 0.15s ease;
+}
+.chev:hover { background: var(--tile-hover); color: var(--text); }
+body:not(.collapsed) .chev { transform: rotate(90deg); }
+
+.title-wrap { display: flex; align-items: center; min-width: 0; }
+.title {
+  font-size: 13px; font-weight: 600; letter-spacing: 0.2px;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  padding: 3px 6px; border-radius: 7px; max-width: 100%;
+}
+.title:hover { background: var(--tile-hover); }
+.title-input {
+  font-size: 13px; font-weight: 600;
+  color: var(--text);
+  background: rgba(var(--bg-1), 0.9);
+  border: 1px solid var(--accent);
+  border-radius: 7px; padding: 2px 6px; outline: none; min-width: 120px;
+}
+
+.badge {
+  font-size: 11px; color: var(--muted);
+  padding: 1px 7px; border-radius: 999px;
+  background: var(--tile-hover); border: 1px solid var(--border);
+}
+
+/* Type designation chip — tells a folder Portal apart from a Bucket at a glance.
+   Portal (live view of a real folder) is accent-tinted to read as "connected";
+   Bucket (a collection of shortcuts) stays neutral. */
+.kind {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 20px; padding: 0 8px 0 6px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+  color: var(--muted);
+  background: var(--tile-hover); border: 1px solid var(--border); border-radius: 999px;
+  white-space: nowrap; user-select: none;
+}
+.kind svg { width: 12px; height: 12px; flex: 0 0 auto; }
+.kind.is-portal {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+.icon-btn {
+  display: grid; place-items: center;
+  width: 28px; height: 28px; border-radius: 8px; color: var(--muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.icon-btn:hover { background: var(--tile-hover); color: var(--text); }
+.icon-btn svg { fill: currentColor; }
+
+/* ---------- collapse ---------- */
+body.collapsed .body, body.collapsed .rh:not(.e):not(.w) { display: none; }
+
+/* ---------- resize handles (generous hit targets, fully inside the window) ---------- */
+.rh { position: absolute; -webkit-app-region: no-drag; z-index: 30; }
+.rh.n { top: 0; left: 14px; right: 14px; height: 8px; cursor: ns-resize; }
+.rh.s { bottom: 0; left: 14px; right: 14px; height: 8px; cursor: ns-resize; }
+.rh.e { right: 0; top: 14px; bottom: 14px; width: 8px; cursor: ew-resize; }
+.rh.w { left: 0; top: 14px; bottom: 14px; width: 8px; cursor: ew-resize; }
+.rh.ne { top: 0; right: 0; width: 18px; height: 18px; cursor: nesw-resize; }
+.rh.nw { top: 0; left: 0; width: 18px; height: 18px; cursor: nwse-resize; }
+.rh.se { bottom: 0; right: 0; width: 18px; height: 18px; cursor: nwse-resize; }
+.rh.sw { bottom: 0; left: 0; width: 18px; height: 18px; cursor: nesw-resize; }
+/* Subtle grip affordance in the bottom-right corner so resizing is discoverable. */
+.rh.se::after {
+  content: ""; position: absolute; right: 3px; bottom: 3px; width: 8px; height: 8px;
+  border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+  border-bottom-right-radius: 3px; opacity: 0.5;
+}
+body.locked .rh { display: none; }
+body.locked .header { -webkit-app-region: no-drag; }
+body.locked .drag-space { -webkit-app-region: no-drag; }

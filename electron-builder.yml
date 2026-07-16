@@ -1,0 +1,30 @@
+appId: com.jacob.desktoporganizer
+productName: Desktop Organizer
+copyright: Copyright © 2026 Jacob
+directories:
+  output: dist
+  buildResources: assets
+files:
+  - src/**/*
+  - assets/**/*
+  - package.json
+# Native addons (koffi's .node) can't be loaded from inside the asar archive —
+# extract them so desktop-pinning + native folder icons work in the packaged app.
+asarUnpack:
+  - "**/*.node"
+win:
+  icon: assets/icon.png
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Desktop Organizer
+portable:
+  artifactName: DesktopOrganizer-Portable-${version}.exe

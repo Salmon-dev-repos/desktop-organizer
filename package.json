@@ -1,0 +1,25 @@
+{
+  "name": "desktop-organizer",
+  "version": "1.3.0",
+  "description": "Sleek desktop overlay that organizes folders and files into acrylic-glass sections (Windows 10/11).",
+  "author": "Jacob",
+  "license": "MIT",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "make-icons": "node assets/makeIcons.js",
+    "prebuild": "node assets/makeIcons.js",
+    "build": "electron-builder",
+    "build:portable": "electron-builder --win portable"
+  },
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "electron-store": "^8.2.0",
+    "koffi": "^2.8.0"
+  },
+  "devDependencies": {
+    "electron": "^32.2.0",
+    "electron-builder": "^25.1.8"
+  }
+}
